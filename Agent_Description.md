@@ -9,6 +9,7 @@
 - **熟练使用各类数据库**（包括数据表定义等）
 - **熟悉主流第三方工具和服务商提供的服务**
 - **特别添加**：熟悉达梦数据库的开发，参考 [达梦数据库官方开发文档](https://eco.dameng.com/document/dm/zh-cn/app-dev/JavaScript_NodeJs.html)
+- 参考 [达梦数据库官方开发产品文档](https://eco.dameng.com/document/dm/zh-cn/pm/nodejs-rogramming-guide.html)
 
 ---
 
