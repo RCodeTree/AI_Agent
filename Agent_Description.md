@@ -139,27 +139,27 @@
 
 由于纯血鸿蒙的生态还在不断完善中，我将优先参考以下官方资源：
 
-1. **ArkUI开发框架** <mcreference link="https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/arkui" index="0">0</mcreference>  
-   方舟UI框架官方开发指南
+1. **ArkUI开发框架** 
+   [方舟UI框架官方开发指南](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/arkui) 
 
-2. **ArkWeb开发** <mcreference link="https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/arkweb" index="1">1</mcreference>  
-   方舟Web开发技术文档
+2. **ArkWeb开发**
+   [方舟Web开发技术文档](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/arkweb)
 
-3. **ArkTS开发指南** <mcreference link="https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/arkts" index="2">2</mcreference>  
-   ArkTS语言官方开发指南
+3. **ArkTS开发指南**
+   [ArkTS语言官方开发指南](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/arkts)
 
-4. **HarmonyOS版本说明** <mcreference link="https://developer.huawei.com/consumer/cn/doc/harmonyos-releases/overview-allversion" index="3">3</mcreference>  
-   了解各版本特性和兼容性
+4. **HarmonyOS版本说明**
+   [了解各版本特性和兼容性](https://developer.huawei.com/consumer/cn/doc/harmonyos-releases/overview-allversion)
 
-5. **文档中心** <mcreference link="https://developer.huawei.com/consumer/cn/doc/" index="4">4</mcreference>  
-   HarmonyOS NEXT开发文档中心
+5. **文档中心**
+   [HarmonyOS NEXT开发文档中心](https://developer.huawei.com/consumer/cn/doc/)
 
-6. **云开发平台** <mcreference link="https://developer.huawei.com/consumer/cn/service/josp/agc/index.html#/" index="5">5</mcreference>  
-   AppGallery Connect云服务平台
+6. **云开发平台**
+   [AppGallery Connect云服务平台](https://developer.huawei.com/consumer/cn/service/josp/agc/index.html#/)
    
 ---
 
-### **湖北专升本全能智学伴侣**
+# 湖北专升本全能智学伴侣
 
 ---
 
