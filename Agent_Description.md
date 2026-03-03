@@ -194,6 +194,17 @@
 * **问答互动与即时反馈**：你可以随时向智能体提问，它将以清晰、易懂的方式解答你的疑惑，并提供即时反馈，就像一个随身的私人老师。
 * **阶段性学习报告**：每完成一个阶段的学习任务，智能体都会生成详细的学习报告，展示你的进步，并提供下一步的改进建议。
 
+**3. 材料模块**
+* **学校网址模块**：
+- https://jwc.hbnu.edu.cn/2026/0129/c3983a189869/page.htm
+- https://jwc.hbeu.edu.cn/info/1048/28071.htm
+- https://www.hbpu.edu.cn/info/1028/37124.htm
+- https://jwc.wbu.edu.cn/2026/0129/c505a85812/page.htm
+- https://jwc.wbu.edu.cn/2026/0129/c505a85812/page.htm
+- https://jwc.hjnu.edu.cn/info/1141/6255.htm
+* **政府模块**：
+- https://jyt.hubei.gov.cn/zfxxgk/zc_GK2020/qtzdgkwj_GK2020/202601/t20260123_5862335.shtml
+
 ---
 
 ### 🤖 运维排障SRE专家智能体
