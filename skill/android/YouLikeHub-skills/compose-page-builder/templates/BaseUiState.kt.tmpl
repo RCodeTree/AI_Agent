@@ -1,0 +1,48 @@
+// BaseUiState.kt.tmpl
+// 基础 UiState 骨架模板
+// 替换说明：
+//   {PACKAGE}   → feature 模块包名
+//   {Name}       → 功能名
+
+package {PACKAGE}
+
+/**
+ * {Name} 页面 UI 状态
+ *
+ * 使用 sealed interface 确保编译器穷举所有状态分支
+ */
+sealed interface {Name}UiState {
+    /** 初次加载中 */
+    data object Loading : {Name}UiState
+
+    /** 加载成功，包含页面所需的所有展示数据 */
+    data class Success(
+        val data: List<{Name}UiModel>,
+        val isRefreshing: Boolean = false,  // 下拉刷新状态
+    ) : {Name}UiState
+
+    /** 加载失败，message 为用户可读的错误描述 */
+    data class Error(
+        val message: String,
+    ) : {Name}UiState
+}
+
+/**
+ * {Name} 列表项 UI 展示模型
+ *
+ * 只包含 UI 展示所需字段：日期/价格为已格式化 String，图片为 URL 或资源引用
+ */
+data class {Name}UiModel(
+    val id: String,
+    val title: String,
+    val subtitle: String? = null,
+    val imageUrl: String? = null,
+    // TODO: 根据实际页面需求添加字段
+    // val priceDisplay: String?,        // 格式化价格 "¥199.00"
+    // val originalPriceDisplay: String?, // 格式化原价（含删除线）
+    // val platformIcon: Int,             // 平台图标 @DrawableRes
+    // val platformName: String,          // 平台显示名
+    // val isFavorite: Boolean,           // 是否收藏
+    // val statusLabel: String,           // 状态标签
+    // val collectedDate: String,         // 格式化采集日期
+)

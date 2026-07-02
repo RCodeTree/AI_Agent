@@ -1,0 +1,185 @@
+// ListPage.kt.tmpl
+// 列表页模板 —— 展示数据集合，支持滚动、筛选、下拉刷新
+// 适用场景：收藏列表、商品流、搜索结果、订单列表
+
+package {PACKAGE}
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.youlikehub.core.ui.components.EmptyContent
+import com.youlikehub.core.ui.components.ErrorContent
+import com.youlikehub.core.ui.components.LoadingIndicator
+
+// --- Screen 层（ViewModel 注入） ---
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun {Name}Screen(
+    onNavigateBack: () -> Unit,
+    onItemClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: {Name}ViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    {Name}ScreenContent(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onItemClick = onItemClick,
+        onRefresh = { viewModel.onRefresh() },
+        onRetry = { viewModel.onRetry() },
+        modifier = modifier,
+    )
+}
+
+// --- Content 层（纯函数） ---
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun {Name}ScreenContent(
+    uiState: {Name}UiState,
+    onNavigateBack: () -> Unit,
+    onItemClick: (String) -> Unit,
+    onRefresh: () -> Unit,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text("列表标题") })
+        },
+        modifier = modifier,
+    ) { paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+            when (uiState) {
+                is {Name}UiState.Loading -> LoadingIndicator()
+
+                is {Name}UiState.Error -> ErrorContent(
+                    message = uiState.message,
+                    onRetry = onRetry,
+                )
+
+                is {Name}UiState.Success -> {
+                    if (uiState.data.isEmpty()) {
+                        EmptyContent(
+                            title = "暂无内容",
+                            description = "这里还没有任何数据",
+                        )
+                    } else {
+                        PullToRefreshBox(
+                            isRefreshing = uiState.isRefreshing,
+                            onRefresh = onRefresh,
+                            modifier = Modifier.fillMaxSize(),
+                        ) {
+                            // 选择 LazyVerticalGrid（瀑布流/网格）或 LazyColumn（单列列表）
+                            ListContent(
+                                items = uiState.data,
+                                onItemClick = onItemClick,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// --- 列表内容（可替换为 LazyColumn 单列模式） ---
+
+@Composable
+private fun ListContent(
+    items: List<{Name}UiModel>,
+    onItemClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 160.dp),
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        items(items = items, key = { it.id }) { item ->
+            {Name}ItemCard(
+                item = item,
+                onClick = { onItemClick(item.id) },
+            )
+        }
+    }
+}
+
+// --- 列表项卡片 ---
+
+@Composable
+private fun {Name}ItemCard(
+    item: {Name}UiModel,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    // TODO: 实现列表项 UI
+    // 使用 Card / ElevatedCard / OutlinedCard
+}
+
+// --- 备选：单列列表模式 ---
+// @Composable
+// private fun SingleColumnList(
+//     items: List<{Name}UiModel>,
+//     onItemClick: (String) -> Unit,
+//     modifier: Modifier = Modifier,
+// ) {
+//     LazyColumn(
+//         modifier = modifier.fillMaxSize(),
+//         contentPadding = PaddingValues(16.dp),
+//         verticalArrangement = Arrangement.spacedBy(8.dp),
+//     ) {
+//         items(items = items, key = { it.id }) { item ->
+//             {Name}ItemRow(
+//                 item = item,
+//                 onClick = { onItemClick(item.id) },
+//             )
+//         }
+//     }
+// }
+
+// --- Preview ---
+
+@Preview(name = "Success", showBackground = true)
+@Composable
+private fun Preview{Name}List() {
+    YouLikeHubTheme {
+        {Name}ScreenContent(
+            uiState = {Name}UiState.Success(
+                data = listOf(
+                    {Name}UiModel(id = "1", title = "示例标题 1", subtitle = "副标题"),
+                    {Name}UiModel(id = "2", title = "示例标题 2", subtitle = "副标题"),
+                ),
+            ),
+            onNavigateBack = {},
+            onItemClick = {},
+            onRefresh = {},
+            onRetry = {},
+        )
+    }
+}

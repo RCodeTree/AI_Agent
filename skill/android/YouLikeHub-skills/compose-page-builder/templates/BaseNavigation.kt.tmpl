@@ -1,0 +1,59 @@
+// BaseNavigation.kt.tmpl
+// 基础 Navigation 骨架模板
+// 替换说明：
+//   {PACKAGE}      → feature 导航包名，如 com.youlikehub.feature.collection.navigation
+//   {Name}          → 功能名，如 CollectionList
+//   {name}          → 功能名（小驼峰），如 collectionList
+//   {ui_package}    → ui 包全路径，如 com.youlikehub.feature.collection.ui
+
+package {PACKAGE}
+
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
+import kotlinx.serialization.Serializable
+import {ui_package}.{Name}Screen
+
+/**
+ * {Name} 页面路由定义
+ */
+@Serializable
+data object {Name}Route
+
+// 如需带参数的路由，使用 data class：
+// @Serializable
+// data class {Name}DetailRoute(val itemId: String)
+
+/**
+ * 注册 {Name} 页面到导航图
+ *
+ * @param onNavigateBack 返回回调（popBackStack 或 navigate Up）
+ * @param onItemClick    列表项点击导航回调（按需）
+ */
+fun NavGraphBuilder.{name}Screen(
+    onNavigateBack: () -> Unit,
+    onItemClick: (String) -> Unit = {},
+) {
+    composable<{Name}Route> {
+        {Name}Screen(
+            onNavigateBack = onNavigateBack,
+            onItemClick = onItemClick,
+        )
+    }
+}
+
+/**
+ * 导航到 {Name} 页面
+ *
+ * 使用 launchSingleTop + saveState/restoreState 避免重复入栈
+ */
+fun NavController.navigateTo{Name}() {
+    navigate({Name}Route) {
+        // 回到主页面时 pop 当前栈到起始目的地
+        popUpTo(graph.findStartDestination().id) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
+    }
+}

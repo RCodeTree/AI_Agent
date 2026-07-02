@@ -1,0 +1,268 @@
+// DetailPage.kt.tmpl
+// 详情页模板 —— 展示单个实体完整信息
+// 适用场景：商品详情、订单详情、平台统计详情
+
+package {PACKAGE}
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
+import com.youlikehub.core.ui.components.ErrorContent
+import com.youlikehub.core.ui.components.LoadingIndicator
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun {Name}Screen(
+    onNavigateBack: () -> Unit,
+    onNavigateToOriginal: (String) -> Unit = {},
+    modifier: Modifier = Modifier,
+    viewModel: {Name}ViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    {Name}ScreenContent(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onNavigateToOriginal = onNavigateToOriginal,
+        onShare = { viewModel.onShare() },
+        onDelete = { viewModel.onDelete() },
+        onRetry = { viewModel.onRetry() },
+        modifier = modifier,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun {Name}ScreenContent(
+    uiState: {Name}UiState,
+    onNavigateBack: () -> Unit,
+    onNavigateToOriginal: (String) -> Unit,
+    onShare: () -> Unit,
+    onDelete: () -> Unit,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("详情") },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onShare) {
+                        Icon(Icons.Default.Share, contentDescription = "分享")
+                    }
+                    IconButton(onClick = onDelete) {
+                        Icon(Icons.Default.Delete, contentDescription = "删除")
+                    }
+                },
+            )
+        },
+        modifier = modifier,
+    ) { paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+            when (uiState) {
+                is {Name}UiState.Loading -> LoadingIndicator()
+                is {Name}UiState.Error -> ErrorContent(
+                    message = uiState.message,
+                    onRetry = onRetry,
+                )
+                is {Name}UiState.Success -> DetailContent(
+                    item = uiState.item,
+                    onNavigateToOriginal = onNavigateToOriginal,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DetailContent(
+    item: {Name}DetailUiModel,
+    onNavigateToOriginal: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+    ) {
+        // Hero 图片
+        AsyncImage(
+            model = item.imageUrl,
+            contentDescription = item.title,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(280.dp)
+                .clip(MaterialTheme.shapes.medium),
+        )
+
+        Column(modifier = Modifier.padding(16.dp)) {
+            // 标题
+            Text(
+                text = item.title,
+                style = MaterialTheme.typography.headlineMedium,
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 价格信息
+            Row {
+                Text(
+                    text = item.priceDisplay,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.error,
+                )
+                if (item.originalPriceDisplay != null) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = item.originalPriceDisplay,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        // TODO: textDecoration = TextDecoration.LineThrough（需要 AnnotatedString 或 buildAnnotatedString）
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+            HorizontalDivider()
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 扩展信息区
+            DetailInfoSection(
+                label = "来源平台",
+                value = item.platformName,
+            )
+            DetailInfoSection(
+                label = "采集时间",
+                value = item.collectedDate,
+            )
+            DetailInfoSection(
+                label = "状态",
+                value = item.statusLabel,
+            )
+
+            // TODO: 添加更多详情内容
+            // - 价格走势图
+            // - 同类推荐
+            // - 跳转到原始 App 按钮
+        }
+    }
+}
+
+@Composable
+private fun DetailInfoSection(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.width(80.dp),
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge,
+        )
+    }
+}
+
+// --- UiState for Detail ---
+
+sealed interface {Name}UiState {
+    data object Loading : {Name}UiState
+    data class Success(
+        val item: {Name}DetailUiModel,
+        val priceHistory: List<PricePointUiModel> = emptyList(),
+    ) : {Name}UiState
+    data class Error(val message: String) : {Name}UiState
+}
+
+data class {Name}DetailUiModel(
+    val id: String,
+    val title: String,
+    val priceDisplay: String,
+    val originalPriceDisplay: String? = null,
+    val imageUrl: String? = null,
+    val platformName: String,
+    val platformIcon: Int = 0,
+    val collectedDate: String,
+    val statusLabel: String,
+    val sourceUrl: String? = null,
+)
+
+data class PricePointUiModel(
+    val date: String,
+    val price: String,
+)
+
+// --- Preview ---
+
+@Preview(name = "Success", showBackground = true)
+@Composable
+private fun Preview{Name}Detail() {
+    YouLikeHubTheme {
+        {Name}ScreenContent(
+            uiState = {Name}UiState.Success(
+                item = {Name}DetailUiModel(
+                    id = "1",
+                    title = "示例商品标题",
+                    priceDisplay = "¥199.00",
+                    originalPriceDisplay = "¥299.00",
+                    platformName = "淘宝",
+                    collectedDate = "2026-07-01",
+                    statusLabel = "在售",
+                ),
+            ),
+            onNavigateBack = {},
+            onNavigateToOriginal = {},
+            onShare = {},
+            onDelete = {},
+            onRetry = {},
+        )
+    }
+}

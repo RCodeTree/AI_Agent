@@ -1,0 +1,198 @@
+// DashboardPage.kt.tmpl
+// 仪表盘模板 —— 多区块数据概览
+// 适用场景：首页、数据统计、个人中心
+
+package {PACKAGE}
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.youlikehub.core.ui.components.ErrorContent
+import com.youlikehub.core.ui.components.LoadingIndicator
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun {Name}Screen(
+    onNavigateBack: () -> Unit,
+    onNavigateToItem: (String) -> Unit = {},
+    onNavigateToAllItems: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    viewModel: {Name}ViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    {Name}ScreenContent(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onNavigateToItem = onNavigateToItem,
+        onNavigateToAllItems = onNavigateToAllItems,
+        onRetry = { viewModel.onRetry() },
+        modifier = modifier,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun {Name}ScreenContent(
+    uiState: {Name}UiState,
+    onNavigateBack: () -> Unit,
+    onNavigateToItem: (String) -> Unit,
+    onNavigateToAllItems: () -> Unit,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text("仪表盘标题") })
+        },
+        modifier = modifier,
+    ) { paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+            when (uiState) {
+                is {Name}UiState.Loading -> LoadingIndicator()
+                is {Name}UiState.Error -> ErrorContent(
+                    message = uiState.message,
+                    onRetry = onRetry,
+                )
+                is {Name}UiState.Success -> DashboardContent(
+                    uiState = uiState,
+                    onNavigateToItem = onNavigateToItem,
+                    onNavigateToAllItems = onNavigateToAllItems,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DashboardContent(
+    uiState: {Name}UiState.Success,
+    onNavigateToItem: (String) -> Unit,
+    onNavigateToAllItems: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+    ) {
+        // 统计卡片区（横向滑动）
+        item(key = "stats") {
+            SectionHeader(title = "概览")
+        }
+        item(key = "stats_cards") {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(horizontal = 4.dp),
+            ) {
+                items(uiState.statCards, key = { it.id }) { card ->
+                    StatsCard(card = card)
+                }
+            }
+        }
+
+        // 快捷入口区
+        item(key = "shortcuts_header") {
+            SectionHeader(
+                title = "快捷入口",
+                action = { TextButton(onClick = { /* TODO */ }) { Text("编辑") } },
+            )
+        }
+        item(key = "shortcuts") {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                items(uiState.shortcuts, key = { it.id }) { shortcut ->
+                    ShortcutItem(item = shortcut)
+                }
+            }
+        }
+
+        // 最近添加
+        item(key = "recent_header") {
+            SectionHeader(
+                title = "最近添加",
+                action = { TextButton(onClick = onNavigateToAllItems) { Text("查看全部") } },
+            )
+        }
+        items(uiState.recentItems.take(5), key = { it.id }) { item ->
+            RecentItemRow(item = item, onClick = { onNavigateToItem(item.id) })
+        }
+    }
+}
+
+// --- Section Header 组件 ---
+
+@Composable
+private fun SectionHeader(
+    title: String,
+    action: @Composable (() -> Unit)? = null,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        action?.invoke()
+    }
+}
+
+// TODO: StatsCard, ShortcutItem, RecentItemRow 组件实现
+
+// --- UiState for Dashboard ---
+
+sealed interface {Name}UiState {
+    data object Loading : {Name}UiState
+    data class Success(
+        val statCards: List<StatsUiModel>,
+        val shortcuts: List<ShortcutUiModel>,
+        val recentItems: List<RecentItemUiModel>,
+    ) : {Name}UiState
+    data class Error(val message: String) : {Name}UiState
+}
+
+data class StatsUiModel(val id: String, val label: String, val value: String, val icon: Int = 0)
+data class ShortcutUiModel(val id: String, val label: String, val icon: Int = 0)
+data class RecentItemUiModel(val id: String, val title: String, val subtitle: String? = null)
+
+// --- Preview ---
+
+@Preview(name = "Success", showBackground = true)
+@Composable
+private fun Preview{Name}Dashboard() {
+    YouLikeHubTheme {
+        {Name}ScreenContent(
+            uiState = {Name}UiState.Success(
+                statCards = listOf(),
+                shortcuts = listOf(),
+                recentItems = listOf(),
+            ),
+            onNavigateBack = {},
+            onNavigateToItem = {},
+            onNavigateToAllItems = {},
+            onRetry = {},
+        )
+    }
+}

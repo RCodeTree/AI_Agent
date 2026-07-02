@@ -1,0 +1,75 @@
+// BaseViewModel.kt.tmpl
+// 基础 ViewModel 骨架模板
+// 替换说明：
+//   {PACKAGE}   → feature 模块包名
+//   {Name}       → 功能名
+
+package {PACKAGE}
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class {Name}ViewModel @Inject constructor(
+    // TODO: 注入 UseCase
+    // private val getItems: GetItemsUseCase,
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow<{Name}UiState>({Name}UiState.Loading)
+    val uiState: StateFlow<{Name}UiState> = _uiState.asStateFlow()
+
+    init {
+        loadData()
+    }
+
+    // --- 公开操作方法 ---
+
+    fun onRetry() {
+        loadData()
+    }
+
+    fun onRefresh() {
+        loadData()
+    }
+
+    // TODO: 添加业务操作方法
+    // fun onItemClick(id: String) { ... }
+    // fun onDelete(id: String) { ... }
+    // fun onToggleFavorite(id: String) { ... }
+
+    // --- 私有方法 ---
+
+    private fun loadData() {
+        viewModelScope.launch {
+            _uiState.value = {Name}UiState.Loading
+            try {
+                // TODO: 调用 UseCase
+                // val items = getItems()
+                // _uiState.value = {Name}UiState.Success(
+                //     data = items.map { it.toUiModel() },
+                // )
+
+                // 临时 mock 数据（开发阶段使用，后续替换为真实数据源）
+                _uiState.value = {Name}UiState.Success(
+                    data = emptyList(), // TODO: 替换
+                )
+            } catch (e: Exception) {
+                _uiState.value = {Name}UiState.Error(
+                    message = e.message ?: "加载失败，请检查网络后重试",
+                )
+            }
+        }
+    }
+
+    // TODO: domain → UiModel 转换
+    // private fun DomainModel.toUiModel() = {Name}UiModel(
+    //     id = this.id,
+    //     title = this.title,
+    // )
+}
